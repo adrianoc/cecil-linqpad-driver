@@ -8,7 +8,7 @@ You can read more about it in [this blog post](http://programing-fun.blogspot.co
 
 Installing it is as simple as:
 
-1. Download the [custom driver](https://github.com/adrianoc/cecil-linqpad-driver/Pre-Compiled/Cecil.LINQPad.Driver.lpx)
+1. Download the [custom driver](https://github.com/adrianoc/cecil-linqpad-driver/blob/master/Pre-Compiled/Cecil.LINQPad.Driver.lpx)
 2. In LINQPad, click in the **Add connection** -> **View more drivers** -> **Browse** and finally select the custom driver file you just downloaded
 
 Alternatively you can also build it yourself:
