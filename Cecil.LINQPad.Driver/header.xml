@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataContextDriver>
+    <MainAssembly>Cecil.LINQPad.Driver.dll</MainAssembly>
+    <SupportUri></SupportUri>
+</DataContextDriver>
