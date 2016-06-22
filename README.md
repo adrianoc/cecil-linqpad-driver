@@ -19,7 +19,7 @@ Alternatively you can also build it yourself:
 
 # Lincense
 
-The whole project is released under the MIT license.
+The whole project is released under the Apache 2.0 license.
 
 
 # How to contribute ?
