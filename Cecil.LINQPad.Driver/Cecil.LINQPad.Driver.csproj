@@ -36,7 +36,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Cecil.LINQPad.Driver.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Cecil.LINQPad.Driver.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LINQPad">
@@ -73,7 +73,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cecil.LINQPad.Driver.pfx" />
+    <None Include="Cecil.LINQPad.Driver.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

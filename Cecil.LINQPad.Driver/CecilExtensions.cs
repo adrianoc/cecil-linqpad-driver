@@ -1,4 +1,4 @@
-﻿/*
+﻿/*k
  * Copyright [2016] [Adriano Carlos Verona]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,22 @@ namespace Cecil.LINQPad.Driver
 				return false;
 
 			return type.Interfaces.Contains(itf);
+		}
+
+		public static bool IsPublicAPI(this EventDefinition self)
+		{
+			return IsPublicAPI(self.AddMethod) || IsPublicAPI(self.RemoveMethod);
+		}
+
+		public static bool IsPublicAPI(this PropertyDefinition self)
+		{
+			
+			return IsPublicAPI(self.GetMethod) || IsPublicAPI(self.SetMethod);
+		}
+
+		public static bool IsPublicAPI(this FieldDefinition self)
+		{
+			return self.IsPublic || self.IsFamily || self.IsFamilyOrAssembly;
 		}
 
 		public static PropertyDefinition Property(this TypeDefinition self, string name)
@@ -98,8 +114,8 @@ namespace Cecil.LINQPad.Driver
 		private static bool IsCallTo(Instruction instruction, MethodReference method)
 		{
 			if (instruction.OpCode != OpCodes.Callvirt
-			    && instruction.OpCode != OpCodes.Call
-			    && instruction.OpCode != OpCodes.Calli)
+				&& instruction.OpCode != OpCodes.Call
+				&& instruction.OpCode != OpCodes.Calli)
 				return false;
 
 			var operand = instruction.Operand as MethodReference;
@@ -107,6 +123,17 @@ namespace Cecil.LINQPad.Driver
 				return false;
 
 			return operand.FullName == method.FullName;
+		}
+
+		private static bool IsPublicAPI(MethodDefinition method)
+		{
+			if (method == null)
+				return false;
+
+			if (!method.DeclaringType.IsPublic && !method.DeclaringType.IsNestedAssembly && !method.DeclaringType.IsNestedFamilyOrAssembly && !method.DeclaringType.IsNestedPublic)
+				return false;
+
+			return method.IsPublic || method.IsFamily || method.IsFamilyOrAssembly;
 		}
 	}
 }
