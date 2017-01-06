@@ -13,23 +13,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Mono.Cecil;
-using Mono.Cecil.Rocks;
 
 namespace Cecil.LINQPad.Driver
 {
 	public class DataContext
 	{
-		public DataContext(AssemblyDefinition assembly)
+		public DataContext(string basePath)
 		{
-			this.assembly = assembly;
+		    LoadAssembliesRecursivelyFrom(basePath);
+
+            container = new AssembliesContainer(assemblies);
 		}
 
-		public IEnumerable<TypeDefinition> Types { get { return assembly.MainModule.GetAllTypes(); } }
-		public IEnumerable<TypeDefinition> PublicTypes { get { return Types.Where(t => t.IsPublic || t.IsNestedPublic || t.IsNestedFamily || t.IsNestedFamilyOrAssembly); } }
+	    public IEnumerable<TypeDefinition> Types { get { return assemblies.Types() ; } }
 
-		private AssemblyDefinition assembly;
+		public IEnumerable<TypeDefinition> PublicTypes { get { return assemblies.PublicTypes(); } }
+
+        public AssembliesContainer Assemblies {  get { return container; } }
+
+        private void LoadAssembliesRecursivelyFrom(string basePath)
+        {
+            var assemblyPaths = Directory.GetFiles(basePath, "*.dll");
+            foreach (var assemblyPath in assemblyPaths)
+            {
+                AssemblyDefinition assembly;
+                if (TryReadAssembly(assemblyPath, out assembly))
+                    assemblies.Add(assembly);
+            }
+
+            foreach (var directory in Directory.GetDirectories(basePath))
+            {
+                LoadAssembliesRecursivelyFrom(directory);
+            }
+        }
+
+	    private bool TryReadAssembly(string assemblyPath, out AssemblyDefinition assembly)
+	    {
+	        try
+	        {
+	            assembly = AssemblyDefinition.ReadAssembly(assemblyPath);
+	            return true;
+	        }
+	        catch (BadImageFormatException)
+	        {
+	            assembly = null;
+	            return false;
+	        }
+        }
+
+	    private IList<AssemblyDefinition> assemblies = new List<AssemblyDefinition>();
+	    private AssembliesContainer container;
 	}
+
+    public class AssembliesContainer
+    {
+        public AssembliesContainer(IEnumerable<AssemblyDefinition> assemblies)
+        {
+            _assemblies = assemblies;
+        }
+
+        public IEnumerable<AssemblyDefinition> WithName(string regex)
+        {
+            var filterRegEx = new Regex(regex, RegexOptions.Compiled);
+            return _assemblies.Where(a => filterRegEx.IsMatch(a.FullName));
+        }
+
+        private readonly IEnumerable<AssemblyDefinition> _assemblies;
+    }
 }

@@ -27,7 +27,7 @@ namespace Cecil.LINQPad.Driver
 	{
 		public override string GetConnectionDescription(IConnectionInfo cxInfo)
 		{
-			var assemblyPath = (string)cxInfo.DriverData.Element("assembly-path");
+			var assemblyPath = (string)cxInfo.DriverData.Element("assembly-base-path");
 			if (string.IsNullOrWhiteSpace(assemblyPath))
 				MessageBox.Show("Unable to retrieve assembly path", "Error");
 
@@ -36,13 +36,13 @@ namespace Cecil.LINQPad.Driver
 
 		public override bool ShowConnectionDialog(IConnectionInfo cxInfo, bool isNewConnection)
 		{
-			var openFile = new OpenFileDialog();
-			if (openFile.ShowDialog() == DialogResult.OK)
+		    var folderBrowser = new FolderBrowserDialog();
+			if (folderBrowser.ShowDialog() == DialogResult.OK)
 			{
 				cxInfo.CustomTypeInfo.CustomAssemblyPath = typeof(DataContext).Assembly.Location;
 				cxInfo.CustomTypeInfo.CustomTypeName = typeof(DataContext).FullName;
 
-				cxInfo.DriverData.SetElementValue("assembly-path", openFile.FileName);
+				cxInfo.DriverData.SetElementValue("assembly-base-path", folderBrowser.SelectedPath);
 				return true;
 			}
 
@@ -69,16 +69,16 @@ namespace Cecil.LINQPad.Driver
 
 		public override ParameterDescriptor[] GetContextConstructorParameters(IConnectionInfo cxInfo)
 		{
-			return new[] { new ParameterDescriptor("assembly", typeof(AssemblyDefinition).FullName) };
+			return new[] { new ParameterDescriptor("assembly", typeof(string).FullName) };
 		}
 
 		public override object[] GetContextConstructorArguments(IConnectionInfo cxInfo)
 		{
-			var assemblyPath = (string)cxInfo.DriverData.Element("assembly-path");
-			if (string.IsNullOrWhiteSpace(assemblyPath))
+			var assemblyBasePath = (string) cxInfo.DriverData.Element("assembly-base-path");
+			if (string.IsNullOrWhiteSpace(assemblyBasePath))
 				MessageBox.Show("Unable to retrieve assembly path", "Error");
 
-			return new object[] { AssemblyDefinition.ReadAssembly(assemblyPath) };
+			return new object[] { assemblyBasePath };
 		}
 
 		public override string Name { get { return ".NET Metadata Query Support"; } }
@@ -95,6 +95,7 @@ namespace Cecil.LINQPad.Driver
 					{
 						new ExplorerItem("Types", ExplorerItemKind.Category, ExplorerIcon.Column) { IsEnumerable = true },
 						new ExplorerItem("PublicTypes", ExplorerItemKind.Category, ExplorerIcon.Column) { IsEnumerable = true },
+						new ExplorerItem("Assemblies", ExplorerItemKind.Category, ExplorerIcon.Column) { IsEnumerable  = false },
 					}
 				}
 			};

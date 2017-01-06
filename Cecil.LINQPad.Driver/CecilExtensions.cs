@@ -13,16 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 
 namespace Cecil.LINQPad.Driver
 {
 	public static class CecilExtensions
 	{
-		public static bool Implements(this TypeDefinition type, TypeReference itf)
+	    public static IEnumerable<TypeDefinition> PublicTypes(this IEnumerable<AssemblyDefinition> assmeblies)
+	    {
+	        return Types(assmeblies).Where(t => t.IsPublic || t.IsNestedPublic || t.IsNestedFamily || t.IsNestedFamilyOrAssembly);
+        }
+
+        public static IEnumerable<TypeDefinition> Types(this IEnumerable<AssemblyDefinition> assmeblies)
+        {
+            return assmeblies.SelectMany(a => a.MainModule.GetAllTypes());
+
+        }
+
+        public static bool Implements(this TypeDefinition type, TypeReference itf)
 		{
 			if (!type.HasInterfaces)
 				return false;
@@ -46,7 +60,18 @@ namespace Cecil.LINQPad.Driver
 			return self.IsPublic || self.IsFamily || self.IsFamilyOrAssembly;
 		}
 
-		public static PropertyDefinition Property(this TypeDefinition self, string name)
+        public static bool IsPublicAPI(this MethodDefinition method)
+        {
+            if (method == null)
+                return false;
+
+            if (!method.DeclaringType.IsPublic && !method.DeclaringType.IsNestedAssembly && !method.DeclaringType.IsNestedFamilyOrAssembly && !method.DeclaringType.IsNestedPublic)
+                return false;
+
+            return method.IsPublic || method.IsFamily || method.IsFamilyOrAssembly;
+        }
+
+        public static PropertyDefinition Property(this TypeDefinition self, string name)
 		{
 			if (!self.HasProperties)
 				return null;
@@ -123,17 +148,6 @@ namespace Cecil.LINQPad.Driver
 				return false;
 
 			return operand.FullName == method.FullName;
-		}
-
-		private static bool IsPublicAPI(MethodDefinition method)
-		{
-			if (method == null)
-				return false;
-
-			if (!method.DeclaringType.IsPublic && !method.DeclaringType.IsNestedAssembly && !method.DeclaringType.IsNestedFamilyOrAssembly && !method.DeclaringType.IsNestedPublic)
-				return false;
-
-			return method.IsPublic || method.IsFamily || method.IsFamilyOrAssembly;
 		}
 	}
 }
