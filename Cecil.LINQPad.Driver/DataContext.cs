@@ -20,6 +20,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Mono.Cecil;
+using Mono.Cecil.Mdb;
+using Mono.Cecil.Pdb;
 
 namespace Cecil.LINQPad.Driver
 {
@@ -31,6 +33,17 @@ namespace Cecil.LINQPad.Driver
 
             container = new AssembliesContainer(assemblies);
 		}
+
+	    public string SourceFor(IMemberDefinition member)
+	    {
+	        var declaringType = member.DeclaringType;
+	        var instruction= declaringType.Methods
+                                        .Where(m => m.HasBody && m.Body.Instructions.Count > 0)
+                                        .SelectMany(m => m.Body.Instructions)
+                                        .FirstOrDefault(i => i.SequencePoint != null && i.SequencePoint.Document != null);
+
+	        return instruction?.SequencePoint.Document.Url;
+        }
 
 	    public IEnumerable<TypeDefinition> Types { get { return assemblies.Types() ; } }
 
@@ -58,7 +71,13 @@ namespace Cecil.LINQPad.Driver
 	    {
 	        try
 	        {
-	            assembly = AssemblyDefinition.ReadAssembly(assemblyPath);
+	            var parameters = new ReaderParameters();
+	            if (File.Exists(assemblyPath + ".mdb"))
+	            {
+	                parameters.SymbolReaderProvider = new MdbReaderProvider();
+	            }
+
+	            assembly = AssemblyDefinition.ReadAssembly(assemblyPath, parameters);
 	            return true;
 	        }
 	        catch (BadImageFormatException)
