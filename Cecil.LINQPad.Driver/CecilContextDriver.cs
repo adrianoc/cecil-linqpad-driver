@@ -34,7 +34,7 @@ namespace Cecil.LINQPad.Driver
             return $"{Path.GetFileName(assemblyPath)} : {Path.GetDirectoryName(assemblyPath)}";
         }
 
-        public override bool ShowConnectionDialog(IConnectionInfo cxInfo, bool isNewConnection)
+        public override bool ShowConnectionDialog(IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)
         {
             var folderBrowser = new FolderBrowserDialog();
             if (folderBrowser.ShowDialog() == DialogResult.OK)
