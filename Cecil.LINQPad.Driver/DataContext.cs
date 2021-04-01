@@ -25,31 +25,31 @@ using Mono.Cecil.Pdb;
 
 namespace Cecil.LINQPad.Driver
 {
-	public class DataContext
-	{
-		public DataContext(string basePath)
-		{
-		    LoadAssembliesRecursivelyFrom(basePath);
+    public class DataContext
+    {
+        public DataContext(string basePath)
+        {
+            LoadAssembliesRecursivelyFrom(basePath);
 
             container = new AssembliesContainer(assemblies);
-		}
+        }
 
-	    public string SourceFor(IMemberDefinition member)
-	    {
-	        var declaringType = member.DeclaringType;
-	        var instruction= declaringType.Methods
+        public string SourceFor(IMemberDefinition member)
+        {
+            var declaringType = member.DeclaringType;
+            var instruction = declaringType.Methods
                                         .Where(m => m.HasBody && m.Body.Instructions.Count > 0)
                                         .SelectMany(m => m.Body.Instructions)
                                         .FirstOrDefault(i => i.SequencePoint != null && i.SequencePoint.Document != null);
 
-	        return instruction?.SequencePoint.Document.Url;
+            return instruction?.SequencePoint.Document.Url;
         }
 
-	    public IEnumerable<TypeDefinition> Types { get { return assemblies.Types() ; } }
+        public IEnumerable<TypeDefinition> Types { get { return assemblies.Types(); } }
 
-		public IEnumerable<TypeDefinition> PublicTypes { get { return assemblies.PublicTypes(); } }
+        public IEnumerable<TypeDefinition> PublicTypes { get { return assemblies.PublicTypes(); } }
 
-        public AssembliesContainer Assemblies {  get { return container; } }
+        public AssembliesContainer Assemblies { get { return container; } }
 
         private void LoadAssembliesRecursivelyFrom(string basePath)
         {
@@ -67,29 +67,29 @@ namespace Cecil.LINQPad.Driver
             }
         }
 
-	    private bool TryReadAssembly(string assemblyPath, out AssemblyDefinition assembly)
-	    {
-	        try
-	        {
-	            var parameters = new ReaderParameters();
-	            if (File.Exists(assemblyPath + ".mdb"))
-	            {
-	                parameters.SymbolReaderProvider = new MdbReaderProvider();
-	            }
+        private bool TryReadAssembly(string assemblyPath, out AssemblyDefinition assembly)
+        {
+            try
+            {
+                var parameters = new ReaderParameters();
+                if (File.Exists(assemblyPath + ".mdb"))
+                {
+                    parameters.SymbolReaderProvider = new MdbReaderProvider();
+                }
 
-	            assembly = AssemblyDefinition.ReadAssembly(assemblyPath, parameters);
-	            return true;
-	        }
-	        catch (BadImageFormatException)
-	        {
-	            assembly = null;
-	            return false;
-	        }
+                assembly = AssemblyDefinition.ReadAssembly(assemblyPath, parameters);
+                return true;
+            }
+            catch (BadImageFormatException)
+            {
+                assembly = null;
+                return false;
+            }
         }
 
-	    private IList<AssemblyDefinition> assemblies = new List<AssemblyDefinition>();
-	    private AssembliesContainer container;
-	}
+        private IList<AssemblyDefinition> assemblies = new List<AssemblyDefinition>();
+        private AssembliesContainer container;
+    }
 
     public class AssembliesContainer
     {
