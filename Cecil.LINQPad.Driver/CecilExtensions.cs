@@ -36,7 +36,7 @@ namespace Cecil.LINQPad.Driver
 
         }
 
-        public static bool Implements(this TypeDefinition type, TypeReference itf)
+        public static bool Implements(this TypeDefinition type, InterfaceImplementation itf)
         {
             if (!type.HasInterfaces)
                 return false;
@@ -113,7 +113,7 @@ namespace Cecil.LINQPad.Driver
 
         public static bool Calls(this MethodDefinition self, MethodInfo method)
         {
-            var importedMethod = self.Module.Import(method);
+            var importedMethod = self.Module.ImportReference(method);
             if (importedMethod == null)
             {
                 //TODO: Log failure.

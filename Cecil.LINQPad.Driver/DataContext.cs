@@ -37,12 +37,13 @@ namespace Cecil.LINQPad.Driver
         public string SourceFor(IMemberDefinition member)
         {
             var declaringType = member.DeclaringType;
-            var instruction = declaringType.Methods
-                                        .Where(m => m.HasBody && m.Body.Instructions.Count > 0)
-                                        .SelectMany(m => m.Body.Instructions)
-                                        .FirstOrDefault(i => i.SequencePoint != null && i.SequencePoint.Document != null);
+            var sequencePoint = (from m in declaringType.Methods
+                                 where m.HasBody && m.Body.Instructions.Count > 0
+                                 from i in m.Body.Instructions
+                                 select m.DebugInformation.GetSequencePoint(i)
+                                ).FirstOrDefault(sp => sp?.Document != null);
 
-            return instruction?.SequencePoint.Document.Url;
+            return sequencePoint?.Document.Url;
         }
 
         public IEnumerable<TypeDefinition> Types { get { return assemblies.Types(); } }
