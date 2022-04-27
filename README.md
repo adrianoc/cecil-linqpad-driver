@@ -8,19 +8,21 @@ You can read more about it in [this blog post](http://programing-fun.blogspot.co
 
 Installing it is as simple as:
 
-1. Download the [custom driver](https://github.com/adrianoc/cecil-linqpad-driver/blob/master/Pre-Compiled/Cecil.LINQPad.Driver.lpx)
+1. Download the [custom driver](https://github.com/adrianoc/cecil-linqpad-driver/blob/master/Pre-Compiled/Cecil.LINQPad.Driver.lpx6)
 2. In LINQPad, click in the **Add connection** -> **View more drivers** -> **Browse** and finally select the custom driver file you just downloaded
+3. At this point you' ll be prompted to select a folder with .NET assemblies to be used in your queries.
 
-Alternatively you can also build it yourself:
+Alternatively you can also build it yourself (instead of downloading):
 
 1. Clone the repository ([or download the sources](https://github.com/adrianoc/cecil-linqpad-driver))
-2. Build the project (VS 2015) (you'll need to fix the reference to LINQPad executable)
-3. ZIP the contents of the build folder (bin/debug) (excluding LINQPad executable) and change the extension of the resulting file to .lpx
+2. Make sure you have .NET 6.0 installed
+3. Make sure you have 7-Zip in your path
+4. run Build\package.zip
+5. The custom driver will be stored in Pre-Compiled/Cecil.LINQPad.Driver.lpx6
 
 # Lincense
 
 The whole project is released under the Apache 2.0 license.
-
 
 # How to contribute ?
 
